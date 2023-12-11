@@ -39,14 +39,25 @@ class ArticleController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreArticleRequest $request)
-    {
-        $article = new Article($request->validated());
-        $file = $request->file('image')->store('/public');
-        $article->image = Storage::url($file);
-        $article->save();
-        return redirect()->route('articles.index');
-    }
+{
+    // Get the authenticated user
+    $user = auth()->user();
 
+    // Create a new article instance with the validated data
+    $article = new Article($request->validated());
+
+    // Set the user_id for the article
+    $article->user_id = $user->id;
+
+    // Upload and store the image
+    $file = $request->file('image')->store('/public');
+    $article->image = Storage::url($file);
+
+    // Save the article
+    $article->save();
+
+    return redirect()->route('articles.index');
+}
     /**
      * Display the specified resource.
      */
